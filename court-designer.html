@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Court Designer | AT Sports</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    :root {
+      --navy: #1b335e;
+      --navy-dark: #142544;
+      --orange: #FF6900;
+      --orange-dark: #e55f00;
+      --white: #ffffff;
+      --gray-100: #f5f5f5;
+      --gray-200: #e5e5e5;
+      --gray-400: #a3a3a3;
+      --gray-600: #525252;
+      --gray-800: #262626;
+      --font-display: 'Bebas Neue', Impact, sans-serif;
+      --font-body: 'Inter', -apple-system, sans-serif;
+    }
+    
+    body {
+      font-family: var(--font-body);
+      background: var(--gray-100);
+      color: var(--gray-800);
+      min-height: 100vh;
+    }
+    
+    .designer {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      min-height: 100vh;
+    }
+    
+    .sidebar {
+      background: white;
+      border-right: 1px solid var(--gray-200);
+      overflow-y: auto;
+    }
+    
+    .sidebar-header {
+      background: var(--navy);
+      color: white;
+      padding: 24px;
+      text-align: center;
+    }
+    
+    .sidebar-header h1 {
+      font-family: var(--font-display);
+      font-size: 1.75rem;
+      text-transform: uppercase;
+    }
+    
+    .sidebar-section {
+      padding: 24px;
+      border-bottom: 1px solid var(--gray-200);
+    }
+    
+    .sidebar-section h3 {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      color: var(--navy);
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    
+    .form-group {
+      margin-bottom: 16px;
+    }
+    
+    .form-group label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--gray-600);
+      margin-bottom: 6px;
+    }
+    
+    .form-group select,
+    .form-group input {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid var(--gray-200);
+      border-radius: 6px;
+      font-size: 0.95rem;
+      font-family: var(--font-body);
+    }
+    
+    .form-group select:focus,
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--orange);
+    }
+    
+    .color-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+    }
+    
+    .color-swatch {
+      width: 100%;
+      aspect-ratio: 1;
+      border-radius: 6px;
+      cursor: pointer;
+      border: 3px solid transparent;
+      transition: all 0.2s;
+    }
+    
+    .color-swatch:hover {
+      transform: scale(1.1);
+    }
+    
+    .color-swatch.active {
+      border-color: var(--navy);
+      box-shadow: 0 0 0 2px white, 0 0 0 4px var(--navy);
+    }
+    
+    .preview-area {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      background: linear-gradient(135deg, #e8e8e8 0%, #d0d0d0 100%);
+    }
+    
+    .court-canvas {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+      max-width: 100%;
+    }
+    
+    .preview-info {
+      margin-top: 24px;
+      text-align: center;
+    }
+    
+    .preview-info h2 {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      color: var(--navy);
+      text-transform: uppercase;
+    }
+    
+    .preview-info p {
+      color: var(--gray-600);
+      margin-top: 8px;
+    }
+    
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 14px 28px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+      width: 100%;
+    }
+    
+    .btn-primary {
+      background: var(--orange);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: var(--orange-dark);
+    }
+    
+    .btn-secondary {
+      background: var(--navy);
+      color: white;
+    }
+    
+    .btn-secondary:hover {
+      background: var(--navy-dark);
+    }
+    
+    .estimate-box {
+      background: var(--navy);
+      color: white;
+      padding: 20px;
+      border-radius: 8px;
+      margin-top: 16px;
+    }
+    
+    .estimate-box .label {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      opacity: 0.7;
+    }
+    
+    .estimate-box .value {
+      font-family: var(--font-display);
+      font-size: 1.75rem;
+      color: var(--orange);
+    }
+    
+    @media (max-width: 900px) {
+      .designer {
+        grid-template-columns: 1fr;
+      }
+      .preview-area {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="designer">
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <h1>Court Designer</h1>
+        <p style="opacity: 0.8; font-size: 0.9rem;">Design your custom court</p>
+      </div>
+      
+      <div class="sidebar-section">
+        <h3>Court Type</h3>
+        <div class="form-group">
+          <select id="courtType" onchange="updateDesign()">
+            <option value="pickleball">Pickleball</option>
+            <option value="tennis">Tennis</option>
+            <option value="basketball">Basketball</option>
+            <option value="multi">Multi-Sport</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label>Dimensions (ft)</label>
+          <div style="display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; align-items: center;">
+            <input type="number" id="courtWidth" value="20" onchange="updateDesign()">
+            <span style="color: var(--gray-400);">×</span>
+            <input type="number" id="courtLength" value="44" onchange="updateDesign()">
+          </div>
+        </div>
+      </div>
+      
+      <div class="sidebar-section">
+        <h3>Playing Area Color</h3>
+        <div class="color-grid" id="playColorGrid"></div>
+      </div>
+      
+      <div class="sidebar-section">
+        <h3>Surround Color</h3>
+        <div class="color-grid" id="surroundColorGrid"></div>
+      </div>
+      
+      <div class="sidebar-section">
+        <h3>Line Color</h3>
+        <div class="color-grid" id="lineColorGrid"></div>
+      </div>
+      
+      <div class="sidebar-section">
+        <h3>Surface Type</h3>
+        <div class="form-group">
+          <select id="surfaceType" onchange="updateDesign()">
+            <option value="acrytech">Acrytech Standard</option>
+            <option value="acrytech-pro">Acrytech Pro</option>
+            <option value="cushionx">CushionX Cushioned</option>
+          </select>
+        </div>
+        
+        <div class="estimate-box">
+          <div class="label">Estimated Cost</div>
+          <div class="value" id="estimatedCost">$2,500 - $4,000</div>
+        </div>
+        
+        <button class="btn btn-primary" style="margin-top: 16px;" onclick="getQuote()">
+          Get Detailed Quote
+        </button>
+        <button class="btn btn-secondary" style="margin-top: 8px;" onclick="downloadDesign()">
+          Download Design
+        </button>
+      </div>
+    </div>
+    
+    <div class="preview-area">
+      <canvas id="courtCanvas" class="court-canvas" width="600" height="400"></canvas>
+      <div class="preview-info">
+        <h2 id="courtTitle">Pickleball Court</h2>
+        <p id="courtDimensions">20' × 44' = 880 sq ft</p>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    // Acrytech color palette
+    const COLORS = [
+      { name: 'Dark Blue', hex: '#1a4b8c' },
+      { name: 'Light Blue', hex: '#5b9bd5' },
+      { name: 'Dark Green', hex: '#2d5a3f' },
+      { name: 'Light Green', hex: '#7cb342' },
+      { name: 'Red', hex: '#c62828' },
+      { name: 'Burgundy', hex: '#7b1f3f' },
+      { name: 'Orange', hex: '#ef6c00' },
+      { name: 'Sand', hex: '#d4a574' },
+      { name: 'Gray', hex: '#607d8b' },
+      { name: 'Slate', hex: '#455a64' },
+    ];
+    
+    const LINE_COLORS = [
+      { name: 'White', hex: '#ffffff' },
+      { name: 'Yellow', hex: '#ffeb3b' },
+      { name: 'Black', hex: '#212121' },
+      { name: 'Red', hex: '#f44336' },
+      { name: 'Blue', hex: '#2196f3' },
+    ];
+    
+    const COURT_DEFAULTS = {
+      pickleball: { width: 20, length: 44, name: 'Pickleball Court' },
+      tennis: { width: 36, length: 78, name: 'Tennis Court' },
+      basketball: { width: 50, length: 94, name: 'Basketball Court' },
+      multi: { width: 60, length: 120, name: 'Multi-Sport Court' },
+    };
+    
+    let currentDesign = {
+      playColor: '#1a4b8c',
+      surroundColor: '#2d5a3f',
+      lineColor: '#ffffff'
+    };
+    
+    // Initialize color grids
+    function initColorGrids() {
+      const playGrid = document.getElementById('playColorGrid');
+      const surroundGrid = document.getElementById('surroundColorGrid');
+      const lineGrid = document.getElementById('lineColorGrid');
+      
+      COLORS.forEach((color, i) => {
+        playGrid.innerHTML += `<div class="color-swatch ${i === 0 ? 'active' : ''}" 
+          style="background: ${color.hex}" 
+          data-color="${color.hex}"
+          onclick="selectColor('play', '${color.hex}', this)"></div>`;
+        
+        surroundGrid.innerHTML += `<div class="color-swatch ${i === 2 ? 'active' : ''}" 
+          style="background: ${color.hex}" 
+          data-color="${color.hex}"
+          onclick="selectColor('surround', '${color.hex}', this)"></div>`;
+      });
+      
+      LINE_COLORS.forEach((color, i) => {
+        lineGrid.innerHTML += `<div class="color-swatch ${i === 0 ? 'active' : ''}" 
+          style="background: ${color.hex}; ${color.hex === '#ffffff' ? 'border: 1px solid #ddd;' : ''}" 
+          data-color="${color.hex}"
+          onclick="selectColor('line', '${color.hex}', this)"></div>`;
+      });
+    }
+    
+    function selectColor(type, color, element) {
+      const gridId = type === 'play' ? 'playColorGrid' : 
+                     type === 'surround' ? 'surroundColorGrid' : 'lineColorGrid';
+      
+      document.querySelectorAll(`#${gridId} .color-swatch`).forEach(s => s.classList.remove('active'));
+      element.classList.add('active');
+      
+      if (type === 'play') currentDesign.playColor = color;
+      if (type === 'surround') currentDesign.surroundColor = color;
+      if (type === 'line') currentDesign.lineColor = color;
+      
+      updateDesign();
+    }
+    
+    function updateDesign() {
+      const courtType = document.getElementById('courtType').value;
+      const defaults = COURT_DEFAULTS[courtType];
+      
+      document.getElementById('courtWidth').value = defaults.width;
+      document.getElementById('courtLength').value = defaults.length;
+      
+      const width = parseInt(document.getElementById('courtWidth').value);
+      const length = parseInt(document.getElementById('courtLength').value);
+      const sqft = width * length;
+      
+      document.getElementById('courtTitle').textContent = defaults.name;
+      document.getElementById('courtDimensions').textContent = `${width}' × ${length}' = ${sqft.toLocaleString()} sq ft`;
+      
+      // Calculate estimate
+      const surfaceType = document.getElementById('surfaceType').value;
+      const pricePerSqFt = surfaceType === 'cushionx' ? 8 : surfaceType === 'acrytech-pro' ? 6 : 4;
+      const minCost = sqft * pricePerSqFt * 0.8;
+      const maxCost = sqft * pricePerSqFt * 1.4;
+      
+      document.getElementById('estimatedCost').textContent = 
+        `$${Math.round(minCost).toLocaleString()} - $${Math.round(maxCost).toLocaleString()}`;
+      
+      drawCourt();
+    }
+    
+    function drawCourt() {
+      const canvas = document.getElementById('courtCanvas');
+      const ctx = canvas.getContext('2d');
+      const courtType = document.getElementById('courtType').value;
+      
+      const width = canvas.width;
+      const height = canvas.height;
+      const padding = 40;
+      
+      // Clear canvas
+      ctx.fillStyle = currentDesign.surroundColor;
+      ctx.fillRect(0, 0, width, height);
+      
+      // Draw court
+      const courtWidth = width - padding * 2;
+      const courtHeight = height - padding * 2;
+      
+      ctx.fillStyle = currentDesign.playColor;
+      ctx.fillRect(padding, padding, courtWidth, courtHeight);
+      
+      // Draw lines based on court type
+      ctx.strokeStyle = currentDesign.lineColor;
+      ctx.lineWidth = 3;
+      
+      // Outer boundary
+      ctx.strokeRect(padding, padding, courtWidth, courtHeight);
+      
+      if (courtType === 'pickleball') {
+        // Non-volley zone (kitchen)
+        const kitchenHeight = courtHeight * 0.159; // 7ft / 44ft
+        ctx.beginPath();
+        ctx.moveTo(padding, padding + kitchenHeight);
+        ctx.lineTo(padding + courtWidth, padding + kitchenHeight);
+        ctx.moveTo(padding, padding + courtHeight - kitchenHeight);
+        ctx.lineTo(padding + courtWidth, padding + courtHeight - kitchenHeight);
+        ctx.stroke();
+        
+        // Center line
+        ctx.beginPath();
+        ctx.moveTo(padding + courtWidth / 2, padding + kitchenHeight);
+        ctx.lineTo(padding + courtWidth / 2, padding + courtHeight - kitchenHeight);
+        ctx.stroke();
+        
+        // Net line
+        ctx.setLineDash([10, 5]);
+        ctx.beginPath();
+        ctx.moveTo(padding, padding + courtHeight / 2);
+        ctx.lineTo(padding + courtWidth, padding + courtHeight / 2);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      } else if (courtType === 'tennis') {
+        // Service boxes
+        const serviceDepth = courtHeight * 0.274; // 21ft / 78ft (approximation)
+        
+        ctx.beginPath();
+        // Service lines
+        ctx.moveTo(padding + courtWidth * 0.15, padding + serviceDepth);
+        ctx.lineTo(padding + courtWidth * 0.85, padding + serviceDepth);
+        ctx.moveTo(padding + courtWidth * 0.15, padding + courtHeight - serviceDepth);
+        ctx.lineTo(padding + courtWidth * 0.85, padding + courtHeight - serviceDepth);
+        
+        // Center service line
+        ctx.moveTo(padding + courtWidth / 2, padding + serviceDepth);
+        ctx.lineTo(padding + courtWidth / 2, padding + courtHeight - serviceDepth);
+        
+        // Doubles alleys
+        ctx.moveTo(padding + courtWidth * 0.15, padding);
+        ctx.lineTo(padding + courtWidth * 0.15, padding + courtHeight);
+        ctx.moveTo(padding + courtWidth * 0.85, padding);
+        ctx.lineTo(padding + courtWidth * 0.85, padding + courtHeight);
+        
+        ctx.stroke();
+        
+        // Net
+        ctx.setLineDash([10, 5]);
+        ctx.beginPath();
+        ctx.moveTo(padding, padding + courtHeight / 2);
+        ctx.lineTo(padding + courtWidth, padding + courtHeight / 2);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      } else if (courtType === 'basketball') {
+        // Center circle
+        ctx.beginPath();
+        ctx.arc(padding + courtWidth / 2, padding + courtHeight / 2, 40, 0, Math.PI * 2);
+        ctx.stroke();
+        
+        // Center line
+        ctx.beginPath();
+        ctx.moveTo(padding + courtWidth / 2, padding);
+        ctx.lineTo(padding + courtWidth / 2, padding + courtHeight);
+        ctx.stroke();
+        
+        // Three-point lines and keys (simplified)
+        const keyWidth = courtWidth * 0.16;
+        const keyDepth = courtHeight * 0.19;
+        
+        // Left key
+        ctx.strokeRect(padding, padding + (courtHeight - keyWidth) / 2, keyDepth, keyWidth);
+        ctx.beginPath();
+        ctx.arc(padding + keyDepth, padding + courtHeight / 2, keyWidth / 2, -Math.PI / 2, Math.PI / 2);
+        ctx.stroke();
+        
+        // Right key
+        ctx.strokeRect(padding + courtWidth - keyDepth, padding + (courtHeight - keyWidth) / 2, keyDepth, keyWidth);
+        ctx.beginPath();
+        ctx.arc(padding + courtWidth - keyDepth, padding + courtHeight / 2, keyWidth / 2, Math.PI / 2, -Math.PI / 2);
+        ctx.stroke();
+      }
+      
+      // Add AT Sports watermark
+      ctx.fillStyle = 'rgba(255,255,255,0.3)';
+      ctx.font = '12px Inter';
+      ctx.fillText('Designed with AT Sports Court Designer', padding + 10, height - 15);
+    }
+    
+    function getQuote() {
+      alert('Quote request feature coming soon! Contact AT Sports for a detailed quote.');
+    }
+    
+    function downloadDesign() {
+      const canvas = document.getElementById('courtCanvas');
+      const link = document.createElement('a');
+      link.download = 'court-design.png';
+      link.href = canvas.toDataURL();
+      link.click();
+    }
+    
+    // Initialize
+    initColorGrids();
+    updateDesign();
+  </script>
+</body>
+</html>

@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Paint Calculator | AT Sports</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    :root {
+      --navy: #1b335e;
+      --navy-dark: #142544;
+      --orange: #FF6900;
+      --orange-dark: #e55f00;
+      --white: #ffffff;
+      --gray-100: #f5f5f5;
+      --gray-200: #e5e5e5;
+      --gray-400: #a3a3a3;
+      --gray-600: #525252;
+      --gray-800: #262626;
+      --font-display: 'Bebas Neue', Impact, sans-serif;
+      --font-body: 'Inter', -apple-system, sans-serif;
+    }
+    
+    body {
+      font-family: var(--font-body);
+      background: var(--gray-100);
+      color: var(--gray-800);
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+    
+    .calculator {
+      max-width: 900px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+    
+    .calc-header {
+      background: var(--navy);
+      color: white;
+      padding: 32px;
+      text-align: center;
+    }
+    
+    .calc-header h1 {
+      font-family: var(--font-display);
+      font-size: 2.5rem;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    
+    .calc-header p {
+      opacity: 0.8;
+      font-size: 1rem;
+    }
+    
+    .calc-body {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+    }
+    
+    .calc-inputs {
+      padding: 32px;
+      border-right: 1px solid var(--gray-200);
+    }
+    
+    .calc-results {
+      padding: 32px;
+      background: var(--gray-100);
+    }
+    
+    .form-group {
+      margin-bottom: 24px;
+    }
+    
+    .form-group label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--navy);
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    .form-group select,
+    .form-group input {
+      width: 100%;
+      padding: 14px 16px;
+      border: 2px solid var(--gray-200);
+      border-radius: 8px;
+      font-size: 1rem;
+      font-family: var(--font-body);
+      transition: border-color 0.2s;
+    }
+    
+    .form-group select:focus,
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--orange);
+    }
+    
+    .dimension-inputs {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 12px;
+      align-items: end;
+    }
+    
+    .dimension-inputs span {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--gray-400);
+      padding-bottom: 14px;
+    }
+    
+    .checkbox-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      background: var(--gray-100);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 2px solid transparent;
+    }
+    
+    .checkbox-item:hover {
+      background: var(--gray-200);
+    }
+    
+    .checkbox-item.active {
+      background: var(--orange);
+      color: white;
+      border-color: var(--orange-dark);
+    }
+    
+    .checkbox-item input {
+      display: none;
+    }
+    
+    .results-title {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      color: var(--navy);
+      text-transform: uppercase;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 2px solid var(--gray-200);
+    }
+    
+    .result-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 0;
+      border-bottom: 1px solid var(--gray-200);
+    }
+    
+    .result-item:last-child {
+      border-bottom: none;
+    }
+    
+    .result-label {
+      font-weight: 500;
+      color: var(--gray-600);
+    }
+    
+    .result-value {
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--navy);
+    }
+    
+    .result-total {
+      background: var(--navy);
+      color: white;
+      margin: 24px -32px -32px;
+      padding: 24px 32px;
+    }
+    
+    .result-total .result-label {
+      color: rgba(255,255,255,0.8);
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    
+    .result-total .result-value {
+      color: var(--orange);
+      font-family: var(--font-display);
+      font-size: 2rem;
+    }
+    
+    .court-preview {
+      margin-top: 24px;
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+    }
+    
+    .court-preview canvas {
+      max-width: 100%;
+      border-radius: 4px;
+    }
+    
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 16px 32px;
+      font-size: 1rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+      width: 100%;
+      margin-top: 16px;
+    }
+    
+    .btn-primary {
+      background: var(--orange);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: var(--orange-dark);
+      transform: translateY(-2px);
+    }
+    
+    .product-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--orange);
+      color: white;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    
+    .material-list {
+      margin-top: 24px;
+    }
+    
+    .material-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 16px;
+      background: white;
+      border-radius: 8px;
+      margin-bottom: 8px;
+    }
+    
+    .material-name {
+      font-weight: 500;
+    }
+    
+    .material-qty {
+      font-weight: 700;
+      color: var(--orange);
+    }
+    
+    @media (max-width: 768px) {
+      .calc-body {
+        grid-template-columns: 1fr;
+      }
+      .calc-inputs {
+        border-right: none;
+        border-bottom: 1px solid var(--gray-200);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="calculator">
+    <div class="calc-header">
+      <h1>Paint Calculator</h1>
+      <p>Get precise material estimates for your court project</p>
+    </div>
+    
+    <div class="calc-body">
+      <div class="calc-inputs">
+        <div class="form-group">
+          <label>Court Type</label>
+          <select id="courtType" onchange="calculate()">
+            <option value="pickleball">Pickleball (20' x 44')</option>
+            <option value="tennis">Tennis (36' x 78')</option>
+            <option value="basketball-half">Basketball Half Court (47' x 50')</option>
+            <option value="basketball-full">Basketball Full Court (50' x 94')</option>
+            <option value="multi">Multi-Sport</option>
+            <option value="custom">Custom Dimensions</option>
+          </select>
+        </div>
+        
+        <div class="form-group" id="customDimensions" style="display: none;">
+          <label>Custom Dimensions (feet)</label>
+          <div class="dimension-inputs">
+            <input type="number" id="customWidth" placeholder="Width" value="60" onchange="calculate()">
+            <span>×</span>
+            <input type="number" id="customLength" placeholder="Length" value="120" onchange="calculate()">
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label>Number of Courts</label>
+          <select id="numCourts" onchange="calculate()">
+            <option value="1">1 Court</option>
+            <option value="2">2 Courts</option>
+            <option value="4">4 Courts</option>
+            <option value="6">6 Courts</option>
+            <option value="8">8 Courts</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label>Surface Type</label>
+          <select id="surfaceType" onchange="calculate()">
+            <option value="acrytech">Acrytech Standard</option>
+            <option value="acrytech-pro">Acrytech Pro</option>
+            <option value="cushionx">CushionX Cushioned</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label>Surface Condition</label>
+          <select id="condition" onchange="calculate()">
+            <option value="new">New Concrete/Asphalt</option>
+            <option value="good">Good - Minor Cracks</option>
+            <option value="fair">Fair - Needs Repair</option>
+            <option value="poor">Poor - Major Cracks</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label>Include Extras</label>
+          <div class="checkbox-group">
+            <label class="checkbox-item" id="extraLines">
+              <input type="checkbox" onchange="toggleExtra(this, 'extraLines'); calculate()"> Line Paint
+            </label>
+            <label class="checkbox-item" id="extraPrimer">
+              <input type="checkbox" checked onchange="toggleExtra(this, 'extraPrimer'); calculate()"> Primer
+            </label>
+            <label class="checkbox-item" id="extraCrack">
+              <input type="checkbox" onchange="toggleExtra(this, 'extraCrack'); calculate()"> Crack Filler
+            </label>
+          </div>
+        </div>
+      </div>
+      
+      <div class="calc-results">
+        <h3 class="results-title">Material Estimate</h3>
+        
+        <div class="result-item">
+          <span class="result-label">Total Area</span>
+          <span class="result-value" id="totalArea">880 sq ft</span>
+        </div>
+        
+        <div class="result-item">
+          <span class="result-label">Surface Coating</span>
+          <span class="result-value" id="surfaceGallons">6 gallons</span>
+        </div>
+        
+        <div class="result-item">
+          <span class="result-label">Primer</span>
+          <span class="result-value" id="primerGallons">3 gallons</span>
+        </div>
+        
+        <div class="result-item" id="lineRow" style="display: none;">
+          <span class="result-label">Line Paint</span>
+          <span class="result-value" id="lineGallons">1 gallon</span>
+        </div>
+        
+        <div class="result-item" id="crackRow" style="display: none;">
+          <span class="result-label">Faultline Crack Repair</span>
+          <span class="result-value" id="crackUnits">2 kits</span>
+        </div>
+        
+        <div class="material-list">
+          <span class="product-badge">Recommended Products</span>
+          <div class="material-item">
+            <span class="material-name" id="productName">Acrytech Court Paint</span>
+            <span class="material-qty" id="productQty">6 gal</span>
+          </div>
+        </div>
+        
+        <div class="result-total">
+          <div class="result-item" style="border: none; padding: 0;">
+            <span class="result-label">Estimated Cost</span>
+            <span class="result-value" id="totalCost">$1,200 - $1,800</span>
+          </div>
+        </div>
+        
+        <button class="btn btn-primary" onclick="getQuote()">Get Detailed Quote</button>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    // Court dimensions in sq ft
+    const COURT_SIZES = {
+      'pickleball': 880,      // 20 x 44
+      'tennis': 2808,         // 36 x 78
+      'basketball-half': 2350, // 47 x 50
+      'basketball-full': 4700, // 50 x 94
+      'multi': 7200,          // 60 x 120 default
+      'custom': 0
+    };
+    
+    // Coverage rates (sq ft per gallon)
+    const COVERAGE = {
+      'acrytech': 100,
+      'acrytech-pro': 90,
+      'cushionx': 75
+    };
+    
+    // Price per gallon estimates
+    const PRICES = {
+      'acrytech': 85,
+      'acrytech-pro': 110,
+      'cushionx': 145,
+      'primer': 45,
+      'line': 65,
+      'crack-kit': 125
+    };
+    
+    function toggleExtra(checkbox, id) {
+      document.getElementById(id).classList.toggle('active', checkbox.checked);
+    }
+    
+    // Initialize
+    document.getElementById('extraPrimer').classList.add('active');
+    
+    function calculate() {
+      const courtType = document.getElementById('courtType').value;
+      const numCourts = parseInt(document.getElementById('numCourts').value);
+      const surfaceType = document.getElementById('surfaceType').value;
+      const condition = document.getElementById('condition').value;
+      
+      // Show/hide custom dimensions
+      document.getElementById('customDimensions').style.display = 
+        courtType === 'custom' ? 'block' : 'none';
+      
+      // Calculate area
+      let areaPerCourt;
+      if (courtType === 'custom') {
+        const w = parseInt(document.getElementById('customWidth').value) || 60;
+        const l = parseInt(document.getElementById('customLength').value) || 120;
+        areaPerCourt = w * l;
+      } else {
+        areaPerCourt = COURT_SIZES[courtType];
+      }
+      
+      const totalArea = areaPerCourt * numCourts;
+      
+      // Calculate gallons needed
+      const coverage = COVERAGE[surfaceType];
+      let surfaceGallons = Math.ceil(totalArea / coverage);
+      
+      // Add extra coats for poor condition
+      if (condition === 'fair') surfaceGallons = Math.ceil(surfaceGallons * 1.2);
+      if (condition === 'poor') surfaceGallons = Math.ceil(surfaceGallons * 1.5);
+      
+      const primerGallons = Math.ceil(totalArea / 150);
+      const lineGallons = Math.ceil(numCourts * 0.5);
+      
+      // Crack repair kits based on condition
+      let crackKits = 0;
+      if (condition === 'fair') crackKits = Math.ceil(numCourts * 0.5);
+      if (condition === 'poor') crackKits = numCourts;
+      
+      // Check extras
+      const includePrimer = document.querySelector('#extraPrimer input').checked;
+      const includeLines = document.querySelector('#extraLines input').checked;
+      const includeCrack = document.querySelector('#extraCrack input').checked || condition === 'fair' || condition === 'poor';
+      
+      // Calculate cost
+      let minCost = surfaceGallons * PRICES[surfaceType] * 0.8;
+      let maxCost = surfaceGallons * PRICES[surfaceType] * 1.2;
+      
+      if (includePrimer) {
+        minCost += primerGallons * PRICES.primer * 0.8;
+        maxCost += primerGallons * PRICES.primer * 1.2;
+      }
+      if (includeLines) {
+        minCost += lineGallons * PRICES.line * 0.8;
+        maxCost += lineGallons * PRICES.line * 1.2;
+      }
+      if (includeCrack && crackKits > 0) {
+        minCost += crackKits * PRICES['crack-kit'] * 0.8;
+        maxCost += crackKits * PRICES['crack-kit'] * 1.2;
+      }
+      
+      // Update UI
+      document.getElementById('totalArea').textContent = totalArea.toLocaleString() + ' sq ft';
+      document.getElementById('surfaceGallons').textContent = surfaceGallons + ' gallons';
+      document.getElementById('primerGallons').textContent = includePrimer ? primerGallons + ' gallons' : '—';
+      document.getElementById('lineGallons').textContent = lineGallons + ' gallon' + (lineGallons > 1 ? 's' : '');
+      document.getElementById('crackUnits').textContent = crackKits + ' kit' + (crackKits !== 1 ? 's' : '');
+      
+      document.getElementById('lineRow').style.display = includeLines ? 'flex' : 'none';
+      document.getElementById('crackRow').style.display = (includeCrack && crackKits > 0) ? 'flex' : 'none';
+      
+      // Product name
+      const productNames = {
+        'acrytech': 'Acrytech Court Paint',
+        'acrytech-pro': 'Acrytech Pro System',
+        'cushionx': 'CushionX Surface'
+      };
+      document.getElementById('productName').textContent = productNames[surfaceType];
+      document.getElementById('productQty').textContent = surfaceGallons + ' gal';
+      
+      document.getElementById('totalCost').textContent = 
+        '$' + Math.round(minCost).toLocaleString() + ' - $' + Math.round(maxCost).toLocaleString();
+    }
+    
+    function getQuote() {
+      // Could open a modal or redirect to contact form
+      alert('Quote request feature coming soon! Contact AT Sports for a detailed quote.');
+    }
+    
+    // Initial calculation
+    calculate();
+  </script>
+</body>
+</html>
